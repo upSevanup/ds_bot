@@ -24,7 +24,7 @@ class RandomThings(commands.Cog):
         await member.ban(reason=reason)
         await ctx.send(f'О мой бог этот парень реально пререшел черту { member.mention }')
 
-    @commands.command()
+    @commands.command(name='unban')
     @commands.has_permissions(administrator=True)
     async def unban(self, ctx, *, member):
         await ctx.channel.purge(limit=1)
@@ -40,20 +40,20 @@ class RandomThings(commands.Cog):
         num = random.randint(int(min_int), int(max_int))
         await ctx.send(num)
 
-    @commands.command()
+    @commands.command(name='mute')
     async def mute(self, ctx, member: discord.Member, *, reason=None):
         mute = discord.utils.get(ctx.guild.roles, name='лох в муте')
         await member.move_to(channel=None)
         await member.add_roles(mute)
         await ctx.send(f'{ctx.author.name} замутил(а) {member.mention} по причине {reason}.')
 
-    @commands.command()
+    @commands.command(name='unmute')
     async def unmute(self, ctx, member: discord.Member):
         mute = discord.utils.get(ctx.guild.roles, name='лох в муте')
         await member.remove_roles(mute)
         await ctx.send(f'{ctx.author.name} раззамутил(а) {member.mention}.')
 
-    @commands.command()
+    @commands.command(name='kick')
     @commands.has_permissions(administrator=True)
     async def kick(self, ctx, member: discord.Member, *, reason='Гнев Бога'):
         await ctx.channel.purge(limit=1)
@@ -61,10 +61,15 @@ class RandomThings(commands.Cog):
         await member.kick(reason=reason)
         await ctx.send(f'{ctx.author.name} в гневе и выкинул с олимпа {member.mention}')
 
+    @commands.command(name='clear')
+    async def clear(self, ctx, amount: int):
+        await ctx.channel.purge(limit=amount + 1)
+        await ctx.send(f'Удалено {amount} сообщений!', delete_after=3)
+
 
 bot = commands.Bot(command_prefix='//', intents=intents)
 bot.add_cog(RandomThings(bot))
 
-TOKEN = "OTU4NjI5NjkxNjk3Mjc5MDA2.YkQHeA.Q7k6cGWJIYbMr_ypA5cAq4ZrRk4"
+TOKEN = "типо токен"
 
 bot.run(TOKEN)
