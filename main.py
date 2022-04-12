@@ -32,7 +32,6 @@ async def get_bank():
     return users
 
 
-
 class MarciBot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -172,8 +171,22 @@ class MarciBot(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.guild = await self.bot.fetch_guild(958272741449039902)  # You server id
-        self.mutedrole = discord.utils.get(self.guild.roles, id=959376510509269032)  # Mute role id
+        self.mutedrole = utils.get(self.guild.roles, id=959376510509269032)  # Mute role id
         self.check_mutes.start()
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+        if "пив" in message.content.lower():
+            await message.channel.send("по пивку?)")
+        elif "марси" in message.content.lower() or "marci" in message.content.lower():
+            await message.channel.send("А!? Да, я тут")
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        channel = self.bot.get_channel(960902344164392970)
+        await channel.send(f'Привет, {member.name}!')
 
 class Eco(commands.Cog):
     def __init__(self, bot):
