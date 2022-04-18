@@ -188,6 +188,63 @@ class MarciBot(commands.Cog):
         channel = self.bot.get_channel(960902344164392970)
         await channel.send(f'Привет, {member.name}!')
 
+    @commands.command(name='poker')
+    async def poker(self, ctx, num: int, member: discord.Member = None):
+        await open_acc(ctx.author)
+        await open_acc(member)
+        users = await get_bank()
+        member_bank = users[str(member.id)]['wallet']
+        author_bank = users[str(ctx.author.id)]['wallet']
+        if author_bank < num:
+            await ctx.send('У вас не достаточно денег')
+            return
+        elif member_bank < num:
+            await ctx.send(f'У {member.mention} не достаточно денег')
+            return
+
+        combos = ['ничего', 'пара', 'две пары', 'сет', 'фулл хаус', 'каре', 'покер']
+        edges = ['\u2680', '\u2681', '\u2682', '\u2683', '\u2684', '\u2685']
+
+        player_1, pl_1_score, combo_1 = poker()
+        player_2, pl_2_score, combo_2 = poker()
+
+        winner = ''
+        looser = ''
+        if player_1 == player_2:
+            if pl_1_score > pl_2_score:
+                winner = ctx.author
+                looser = member
+            elif pl_1_score < pl_2_score:
+                winner = member
+                looser = ctx.author
+        elif combos.index(player_1) > combos.index(player_2):
+            winner = ctx.author
+            looser = member
+        else:
+            winner = member
+            looser = ctx.author
+
+        await ctx.send(f'''{ctx.author.mention}: 
+{edges[combo_1[0] - 1]} {edges[combo_1[1] - 1]} {edges[combo_1[2] - 1]} {edges[combo_1[3] - 1]} {edges[combo_1[4] - 1]} 
+комбинация: {player_1} 
+счёт: {pl_1_score} \n
+{member.mention}: 
+{edges[combo_2[0] - 1]} {edges[combo_2[1] - 1]} {edges[combo_2[2] - 1]} {edges[combo_2[3] - 1]} {edges[combo_2[4] - 1]} 
+комбинация: {player_2} 
+счёт: {pl_2_score} \n
+Победил {winner.mention}!''')
+
+        await open_acc(winner)
+        users = await get_bank()
+        users[str(winner.id)]['wallet'] += num
+        write_json('jsons/bank', users)
+
+        await open_acc(looser)
+        users = await get_bank()
+        users[str(looser.id)]['wallet'] += num * -1
+        write_json('jsons/bank', users)
+
+
 class Eco(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
